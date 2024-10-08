@@ -31,7 +31,7 @@ export async function serveCoffee(): Promise<string>  {
   return 'Coffee served.';
 }
 
-export async function pushOrderUpdate(orderId: string, message: string): Promise<void> {
+export async function pushOrderUpdate(orderId: string, coffeeType: string, requests: string, status: string): Promise<void> {
   logger.log('Pushing order updates to queue...');
-  client.emit('order_updates', { orderId, message });
+  client.emit('order_updates', { orderId, coffeeType, requests, status });
 }

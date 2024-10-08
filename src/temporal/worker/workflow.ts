@@ -9,28 +9,29 @@ export const serveCoffeeSignal = defineSignal('serveCoffee');
 
 export async function coffeeWorkflow(orderId: string, coffeeType: string, requests: string) {
   console.log(`Received order ${orderId} for ${coffeeType} with ${requests}`);
+  await pushOrderUpdate(orderId, coffeeType, requests, 'Order created.')
   
   let serveCoffeeReceived = false;
   setHandler(serveCoffeeSignal, () => {
     serveCoffeeReceived = true;
   });
 
-  let result = await boilWater();
-  await pushOrderUpdate(orderId, result);
+  let status = await boilWater();
+  await pushOrderUpdate(orderId, coffeeType, requests, status);
 
-  result = await brewCoffee();
-  await pushOrderUpdate(orderId, result);
+  status = await brewCoffee();
+  await pushOrderUpdate(orderId, coffeeType, requests, status);
 
   console.log(`Waiting for "serveCoffee" signal for order ${orderId}...`);
   
-  result = await new Promise<string>((resolve) => {
+  status = await new Promise<string>((resolve) => {
     setHandler(serveCoffeeSignal, async () => {
       serveCoffeeReceived = true;
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      result = await serveCoffee();
-      resolve(result);
+      status = await serveCoffee();
+      resolve(status);
     });
   });
   
-  await pushOrderUpdate(orderId, result);
+  await pushOrderUpdate(orderId, coffeeType, requests, status);
 }

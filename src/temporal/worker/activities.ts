@@ -1,10 +1,12 @@
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { Logger } from '@nestjs/common';
 
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672'
+
 const client = ClientProxyFactory.create({
   transport: Transport.RMQ,
   options: {
-    urls: ['amqp://admin:admin@localhost:5672'],
+    urls: [RABBITMQ_URL],
     queue: 'order_updates',
     queueOptions: {
       durable: false,

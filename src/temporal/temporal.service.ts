@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { WorkflowClient } from '@temporalio/client';
+import { Connection, WorkflowClient } from '@temporalio/client';
 import { serveCoffeeSignal, coffeeWorkflow } from './worker/workflow';
+
+const TEMPORAL_ADDRESS = process.env.TEMPORAL_ADDRESS || 'localhost:7233';
 
 @Injectable()
 export class TemporalService {
@@ -8,7 +10,15 @@ export class TemporalService {
   private client: WorkflowClient;
 
   constructor() {
-    this.client = new WorkflowClient();
+    this.initializeClient();
+  }
+
+  private async initializeClient() {
+    this.client = new WorkflowClient({
+      connection: await Connection.connect({
+        address: TEMPORAL_ADDRESS,
+      }),
+    });
   }
 
   async startWorkflow(orderId: string, coffeeType: string, requests: string) {

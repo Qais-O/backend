@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672'
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -15,7 +17,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://admin:admin@localhost:5672'],
+      urls: [RABBITMQ_URL],
       queue: 'order_updates',
       queueOptions: {
         durable: false,
